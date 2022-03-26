@@ -1,0 +1,1 @@
+omit = src/**/__init__.py,src/tests/**,src/input_files,src/output_files,src/main.py
