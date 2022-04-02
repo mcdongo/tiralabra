@@ -26,7 +26,7 @@ def instructions():
     print("Example: python3 main.py compress ABBABBAGCTGCTBAAGTBCCTGAABCBCBCTGBABTAGBTCBB")
 
 def compress():
-    print(f"Compressed string: {lzw.compress(sys.argv[2])}")
+    print(f"Compressed string: {lzw.handle_compression(sys.argv[2], 'testi.lzw')}")
 
 def decompress():
     print(f"Decompressed string: {lzw.decompress(sys.argv[2])}")
