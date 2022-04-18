@@ -1,0 +1,11 @@
+# Week 4
+
+I started this week with the same problem I had earlier: How to store data in a meaningful way which actually decreases the file size. At first I tackled this problem with trying to manually do bitwise operations and bit manipulation. This proved to be very difficult. The way I approached this was to have a single "buffer" byte, and in a sense, ignore the limitations of only having the ability to write bytes, not bits. The buffer would "continue" the earlier value, for example: If the value written is 500, it would be a 2-byte piece in binary: 0000 0001 1111 0100. If it was written this way, 7 bits would go to waste, so those earlier 7 bits would have been in use for the earlier value examined. Unfortunately I couldn't figure out how to handle this when reading the file. The problem was to figure out when a value starts and when it ends. After hours of frustration I gave up on this idea and found the built-in library struct, which packed the data in a sufficient way to get significant file size reductions with large pieces of text. 
+
+Once again, I generated a 100kB piece of Lorem Ipsum text and ran it through the algorithm. The results were great: 64% reduction in size. The same problem still persists: With small pieces of text, which have next-to-no repetition increase the file size ever so slightly, however these problems are so insignificant that I don't plan on trying to solve them. If I found a perfect way to write the data, it may still not decrease the size at all, if the files were small and had no repetition.
+
+In a nutshell I got the LZW-algorithm working well and made documentation for everything this app yet has to offer. I added tests which have value: These tests run the compression and decompression algorithms and compare the difference between file sizes. It also checks that the original string is the same with the decompressed string. After this I started to study the Huffman encoding algorithm and I believe to have understood it fairly well. I started to experiment with its concepts and plan to start implementing it next week.
+
+This week's submission was very late! I forgot to commit and push it into the repository. My bad.
+
+Time spent this week: 15 hours

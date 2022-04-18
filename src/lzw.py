@@ -1,116 +1,147 @@
-import sys, os
-from string import ascii_letters
+from filehandler import *
 
-DIRNAME = os.path.dirname(__file__)
-INPUT_DIR = os.path.join(DIRNAME, 'input_files')
-OUTPUT_DIR = os.path.join(DIRNAME, 'output_files')
 
 class LZW:
     """Class which contains encoding and decoding methods
     for Lempel-Ziv-Welch algorithm
     """
 
-    def handle_compression(self, input_string, output_filename):
-        if len(input_string) > 3:
-            if input_string[-4::] == ".txt":
-                with open(os.path.join(INPUT_DIR, input_string), "r") as file:
-                    input_string = file.read()
+    def handle_compression(self, input_file, normal_dir=NORMAL_DIR, packed_dir=PACKED_DIR):
+        """Method which reads the input string from a file
+        and compresses it.
+        Stores it into a desired file in packed_files folder.
+
+        args:
+            input_string (str): The filename the desired
+                file
+            normal_dir (str): The directory where unpacked
+                files are located (by default /normal_files)
+            packed_dir (str): The directory where packed
+                files are located (by default /packed_files)
+        returns:
+            output_string (str): compressed version of the contents
+                of input_string
+            None if the input file specified does not exist
+        """
+        try:
+            input_string = read_from_input_file(input_file, normal_dir)
+        except FileNotFoundError:
+            print('The file specified does not exist.')
+            return None
         output_string, output_array = self.compress(input_string)
-        self.write_to_file(output_array, output_filename)
+        write_to_coded_file(output_array, input_file, packed_dir)
         return output_string
 
+    def handle_decompression(self, input_file, normal_dir=NORMAL_DIR, packed_dir=PACKED_DIR):
+        """Method which reads compressed binary data from a specified
+        file, runs it through the decompression algorithm and writes
+        it into a normal text file.
+
+        args:
+            input_file (str): The filename in question
+            normal_dir (str): The directory where normal
+                files are located (by default /normal_files)
+            packed_dir (str): The directory where compressed
+                files are located (by default /packed files)
+        returns:
+            decoded_string (str): The contents of a compressed
+                binary file converted into text
+            None if the file specified can't be found
+        """
+        try:
+
+            coded_array = read_from_coded_file(input_file, packed_dir)
+        except FileNotFoundError:
+            print('The specified file does not exist.')
+            return None
+
+        decoded_string = self.decompress(coded_array)
+        write_to_file(decoded_string, input_file, normal_dir)
+
+        return decoded_string
+
+    def handle_comparison(self, input_file, normal_dir=NORMAL_DIR, packed_dir=PACKED_DIR):
+        """Method which takes an input text file, compresses it
+        and then compares the file size between the original with
+        the compressed one.
+
+        args:
+            input_file (str): Name of the file in question
+            normal_dir (str): The directory where normal
+                files are located (by default /normal_files)
+            packed_dir (str): The directory where compressed
+                files are located (by default /packed_files)
+        returns:
+            unpacked_size (int), packed_size (int) (tuple):
+                The sizes of said files
+            None if the input file can't be found
+        """
+        if not self.handle_compression(input_file, normal_dir, packed_dir):
+            return None
+        unpacked_size = get_size(input_file, False, normal_dir, packed_dir)
+        packed_size = get_size(input_file, True, normal_dir, packed_dir)
+
+        return (unpacked_size, packed_size)
+
     def compress(self, input_string):
-        """Method which accepts a single string as an argument
-        (At the moment only basic ascii letters are accepted)
-        and compresses it by using a dictionary approach.
-        Patterns which are seen multiple times inside a given
-        string will be replaced with a key.
+        """Method which applies the LZW-algorithm onto
+        a string and returns a compressed version of it
 
         Args:
             input_string (str): string to be compressed
         Returns:
             output_string (str): compressed string
-            output_array (list): an array of 2-byte long bytes objects
-        Raises:
-            ValueError if input_string contains a character which is not
-                in the first 256 values of ascii mapping
+            output_array (list): a list containing all set integer
+                values for certain strings and substrings
         """
-        keys = {}
+        keys = {chr(x): x for x in range(256)}
+        nth_value = 256
         output_string = ''
         output_array = []
-        index = 0
-        substring_pos = 1
-        nth_value = 256
-        
-        while index + substring_pos <= len(input_string):
-            substring = input_string[index:index+substring_pos]
+        substring = ''
 
-            if ord(substring[-1]) > 255:
-                raise ValueError
-            if substring in keys:
-                substring_pos += 1
-                continue
-
-            keys[substring] = nth_value
-            index += substring_pos
-            substring_pos = 1
-            nth_value += 1
-
-            if len(substring) == 1:
-                output_string += substring
-                output_array.append(ord(substring).to_bytes(2, sys.byteorder))
+        for character in input_string:
+            if substring + character in keys:
+                substring += character
             else:
-                output_string += str(keys[substring[:-1]]) + substring[-1]
-                output_array.append(int(keys[substring[:-1]]).to_bytes(2, sys.byteorder))
-                output_array.append(ord(substring[-1]).to_bytes(2, sys.byteorder))
-        
-        """if substring in keys:
-            output_string += str(keys[substring])"""
+                output_string += str(keys[substring])
+                output_array.append(keys[substring])
+                keys[substring+character] = nth_value
+                nth_value += 1
+                substring = character
+
+        output_string += str(keys[substring])
+        output_array.append(keys[substring])
 
         return output_string, output_array
 
-    def write_to_file(self, output_array, filename):
-        with open(os.path.join(OUTPUT_DIR, filename), "wb") as file:
-            for byte in output_array:
-                file.write(byte)
+    def decompress(self, coded_array):
+        """Method which decompresses a string which
+        has been compressed with the LZW-algorithm.
 
-    def decompress(self, coded_string):
-        """A method which accepts a single already encoded string
-        and decodes it in a reverse order compared to the encode method.
-
-        Args:
-            coded_string (str): compressed string
-        Returns:
+        args:
+            coded_array (list): a list containing
+                integers which represent a character
+                or a substring
+        returns:
             output_string: decoded string
         """
-        keys = {}
+        keys = {x: chr(x) for x in range(256)}
         output_string = ''
-        index = 0
-        substring_pos = 1
         nth_value = 256
 
-        while index + substring_pos <= len(coded_string):
-            substring = coded_string[index:index+substring_pos]
-            if len(substring) == 1 and substring in ascii_letters:
-                keys[str(nth_value)] = substring
-                nth_value += 1
-                index += substring_pos
-                substring_pos = 1
-                output_string += substring
-                continue
-            if substring[-1] in ascii_letters:
-                combined = keys[substring[:-1]] + substring[-1]
-                keys[str(nth_value)] = combined
-                output_string += combined
-                nth_value += 1
-                index += substring_pos
-                substring_pos = 1
-                continue
-            substring_pos += 1
-
-        if substring in keys and output_string[:-substring_pos-1] != keys[substring]:
-            output_string += keys[substring]
+        old_value = coded_array.pop(0)
+        output_string += keys[old_value]
+        for character in coded_array:
+            if character not in keys:
+                substring = keys[old_value] + last_character
+            else:
+                substring = keys[character]
+            output_string += substring
+            last_character = substring[0]
+            keys[nth_value] = keys[old_value]+last_character
+            nth_value += 1
+            old_value = character
 
         print(f"decoded: {output_string}")
-        return(output_string)
-
+        return output_string

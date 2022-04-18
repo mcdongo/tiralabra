@@ -1,4 +1,7 @@
 **/__pycache__/
 .coverage
 htmlcov/
-/src/testi.py
+./pytest_cache
+
+src/normal_files/*
+!src/normal_files/sample.txt
