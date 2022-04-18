@@ -1,5 +1,8 @@
 # DSA Project
 
+[![codecov](https://codecov.io/gh/mcdongo/tiralabra/branch/master/graph/badge.svg?token=W12Y2KLWN2)](https://codecov.io/gh/mcdongo/tiralabra)
+![Github Actions](https://github.com/mcdongo/tiralabra/workflows/CI/badge.svg)
+
 ## Documentation
 
 [Project definition](/documentation/definingdoc.md)
