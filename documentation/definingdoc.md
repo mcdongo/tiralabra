@@ -8,4 +8,5 @@ I'm studying for CS Bachelor's degree.
 ## Sources
 
 [Huffman coding](https://en.wikipedia.org/wiki/Huffman_coding)
+
 [Lempel-Ziv-Welch](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Welch)
