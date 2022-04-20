@@ -5,6 +5,9 @@ DIRNAME = os.path.dirname(__file__)
 NORMAL_DIR = os.path.join(DIRNAME, 'normal_files')
 PACKED_DIR = os.path.join(DIRNAME, 'packed_files')
 
+if not os.path.isdir(PACKED_DIR):
+    os.mkdir(PACKED_DIR)
+
 
 def write_to_file(output, filename, path=NORMAL_DIR):
     """Function which writes a plain string into a file
