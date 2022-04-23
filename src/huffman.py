@@ -1,11 +1,13 @@
 from heapq import heappop, heappush
 from filehandler import *
 
+
 class PriorityQueue:
     """A class simplifying the use of a heap
     for the specific purpose to create a tree
     data structure for Huffman coding.
     """
+
     def __init__(self):
         self._elements = []
         self._priorities = {}
@@ -13,7 +15,7 @@ class PriorityQueue:
     def has_one_element(self):
         """Method which returns true if
         there is only one element in the _elements heap
-        
+
         returns:
             boolean: True if only one element in heap
                 False otherwise
@@ -48,6 +50,7 @@ class PriorityQueue:
 class Node:
     """Class used to create the necessary tree structure
     for Huffman coding"""
+
     def __init__(self, freq, symbol, left=None, right=None):
         """Class initializer
 
@@ -69,6 +72,7 @@ class Huffman:
     """Class in charge of the Huffman coding compression
     and decompression algorithms.
     """
+
     def __init__(self):
         self.freq = {}
         self.codes = {}
@@ -101,22 +105,22 @@ class Huffman:
             List: list of Node-objects
         """
         queue = PriorityQueue()
-    
+
         for x in self.freq:
             queue.insert(self.freq[x], Node(self.freq[x], x))
-        
+
         while not queue.has_one_element():
             left = queue.get_next()
             right = queue.get_next()
-    
+
             left.huff = 0
             right.huff = 1
-    
+
             new_node = Node(left.freq + right.freq, left.symbol +
                             right.symbol, left, right)
-    
+
             queue.insert(left.freq + right.freq, new_node)
-        
+
         self.nodes = queue.get_nodes()
 
     def merge_nodes(self, node, val=''):
@@ -131,11 +135,11 @@ class Huffman:
         if node.left:
             self.merge_nodes(node.left, new_val)
         if node.right:
-            self.merge_nodes(node.right,new_val)
+            self.merge_nodes(node.right, new_val)
 
         if not node.left and not node.right:
             self.codes[node.symbol] = new_val
-        
+
         return self.codes
 
     def compress(self, input_string):
@@ -145,7 +149,6 @@ class Huffman:
             output_string += str(self.codes[character])
 
         return output_string
-
 
     def handle_compression(self, filename, normal_dir=NORMAL_DIR, packed_dir=PACKED_DIR):
         try:

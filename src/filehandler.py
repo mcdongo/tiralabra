@@ -1,4 +1,5 @@
-import os, json
+import os
+import json
 from struct import pack, unpack
 
 DIRNAME = os.path.dirname(__file__)
@@ -123,6 +124,7 @@ def read_json(filename, path=PACKED_DIR):
 
     return codes
 
+
 def write_json(filename, content, path=PACKED_DIR):
     """Function which dumps json data into a file
 
@@ -134,9 +136,10 @@ def write_json(filename, content, path=PACKED_DIR):
     with open(os.path.join(path, f"{filename.split('.')[0]}.json"), 'w') as file:
         json.dump(content, file)
 
+
 def read_from_huffman_file(filename, path=PACKED_DIR):
     """Function which reads raw binary data from a .huf file
-    
+
     args:
         filename (str): Name of the file in question
         path (str): Path of the wanted directory (by default /packed_dir)
@@ -145,6 +148,7 @@ def read_from_huffman_file(filename, path=PACKED_DIR):
         data = file.read()
 
     return data
+
 
 def write_huffman_file(output, filename, path=PACKED_DIR):
     """Function which writes Huffman-compressed binary data
@@ -157,4 +161,3 @@ def write_huffman_file(output, filename, path=PACKED_DIR):
     """
     with open(os.path.join(path, f"{filename.split('.')[0]}.huf"), 'wb') as file:
         file.write(output)
-

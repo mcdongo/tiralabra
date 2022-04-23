@@ -1,0 +1,5 @@
+# Week 5
+
+This week I managed to create a working compression and decompression Huffman coding algorithms. It took quite a lot of research and trial and error to get it to work. At the moment there is still a small problem, the decompression part sometimes add a extra character in the end. This results in not being able to do all the tests at the moment. I have an idea how to fix this and will do so next week. Also the codes used in compressing and decompressing with Huffman is at the moment stored as a separate json file, which is not too efficient. This too will be fixed next week as I search for a way to integrate it into the compressed file. With the way this app writes Huffman data, it's less efficient than LZW. With the same Lorem ipsum string a file compressed with LZW was roughly 34% smaller than Huffman. Nonetheless Huffman achieved a great 46% decrease in file size with the same input. Next week I will polish the code, add all documentation necessary, fix these small issues I still have and start working on a simple GUI.
+
+Time spent this week: 15 hours

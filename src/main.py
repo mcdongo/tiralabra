@@ -54,10 +54,10 @@ def instructions():
     print("Example: python3 main.py lzw decompress test.lzw\n")
     print("Comparison command compares the filesize between an " +
           "unpacked and packed instance of data.")
-    print("Here again, second argument must be the algorithm desired and third the "+
+    print("Here again, second argument must be the algorithm desired and third the " +
           "filename of an unpacked .txt file.")
     print("Example: python3 main.py lzw compare test.txt\n")
-    print("If you want to compare between lzw and huffman, give compare as the first argument "+
+    print("If you want to compare between lzw and huffman, give compare as the first argument " +
           "then an unpacked .txt file.")
     print("Example: python3 main.py compare sample.txt")
 
@@ -87,18 +87,21 @@ def compare_lzw(filename):
             "LZW-algorithm achieved a total of " +
             f"{round((sizes[0]-sizes[1])/sizes[0], 3)*100}% decrease in file size."
         )
-    
+
     return sizes[1]
+
 
 def compress_huffman():
     """Function which calls the Huffman coding compression of a file"""
     compressed_string = huff.handle_compression(sys.argv[3])
     print(f"Compressed string: {compressed_string}")
 
+
 def decompress_huffman():
     """Function which calls the Huffman coding decompression of a file"""
     decompressed_string = huff.handle_decompression(sys.argv[3])
     print(f"Decompressed string: {decompressed_string}")
+
 
 def compare_huffman(filename):
     """Function which compares the file sizes between a Huffman-
@@ -114,6 +117,7 @@ def compare_huffman(filename):
         return sizes[1]
     return None
 
+
 def compare_algorithms():
     """Function which compares the compression efficiency between
     LZW and Huffman coding"""
@@ -126,11 +130,12 @@ def compare_algorithms():
         return
 
     if lzw_size < huff_size:
-        print(f"LZW-compressed file is {round((huff_size - lzw_size)*100/huff_size, 2)}% smaller than "+
-        "Huffman-compressed file.")
+        print(f"LZW-compressed file is {round((huff_size - lzw_size)*100/huff_size, 2)}% smaller than " +
+              "Huffman-compressed file.")
     else:
-        print(f"Huffman-compressed file is {round((lzw_size - huff_size)*100/lzw_size, 2)}% smaller than "+
-        "LZW-compressed file")
+        print(f"Huffman-compressed file is {round((lzw_size - huff_size)*100/lzw_size, 2)}% smaller than " +
+              "LZW-compressed file")
+
 
 if __name__ == '__main__':
     start_time = time.time()
