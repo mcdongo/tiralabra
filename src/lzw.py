@@ -26,7 +26,7 @@ class LZW:
         try:
             input_string = read_from_input_file(input_file, normal_dir)
         except FileNotFoundError:
-            print('The file specified does not exist.')
+            print('The specified file does not exist.')
             return None
         output_string, output_array = self.compress(input_string)
         write_to_coded_file(output_array, input_file, packed_dir)
@@ -79,6 +79,7 @@ class LZW:
         if not self.handle_compression(input_file, normal_dir, packed_dir):
             return None
         unpacked_size = get_size(input_file, False, normal_dir, packed_dir)
+        input_file = f"{input_file.split('.')[0]}.lzw"
         packed_size = get_size(input_file, True, normal_dir, packed_dir)
 
         return (unpacked_size, packed_size)
