@@ -210,11 +210,3 @@ class Huffman:
         json_size = get_size(filename, True, normal_dir, packed_dir)
         print(unpacked_size, packed_size)
         return (unpacked_size, packed_size+json_size)
-
-
-if __name__ == '__main__':
-    huff = Huffman()
-    huff.handle_compression('sample.txt')
-    text = read_from_input_file('sample.txt')
-    decoded_text = huff.handle_decompression('sample.huf')
-    print(decoded_text)
