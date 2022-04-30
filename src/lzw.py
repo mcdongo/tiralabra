@@ -1,4 +1,4 @@
-from filehandler import *
+import filehandler as fh
 
 
 class LZW:
@@ -6,7 +6,7 @@ class LZW:
     for Lempel-Ziv-Welch algorithm
     """
 
-    def handle_compression(self, input_file, normal_dir=NORMAL_DIR, packed_dir=PACKED_DIR):
+    def handle_compression(self, input_file, normal_dir=fh.NORMAL_DIR, packed_dir=fh.PACKED_DIR):
         """Method which reads the input string from a file
         and compresses it.
         Stores it into a desired file in packed_files folder.
@@ -24,15 +24,15 @@ class LZW:
             None if the input file specified does not exist
         """
         try:
-            input_string = read_from_input_file(input_file, normal_dir)
+            input_string = fh.read_from_input_file(input_file, normal_dir)
         except FileNotFoundError:
             print('The specified file does not exist.')
             return None
         output_string, output_array = self.compress(input_string)
-        write_to_coded_file(output_array, input_file, packed_dir)
+        fh.write_to_coded_file(output_array, input_file, packed_dir)
         return output_string
 
-    def handle_decompression(self, input_file, normal_dir=NORMAL_DIR, packed_dir=PACKED_DIR):
+    def handle_decompression(self, input_file, normal_dir=fh.NORMAL_DIR, packed_dir=fh.PACKED_DIR):
         """Method which reads compressed binary data from a specified
         file, runs it through the decompression algorithm and writes
         it into a normal text file.
@@ -50,17 +50,17 @@ class LZW:
         """
         try:
 
-            coded_array = read_from_coded_file(input_file, packed_dir)
+            coded_array = fh.read_from_coded_file(input_file, packed_dir)
         except FileNotFoundError:
             print('The specified file does not exist.')
             return None
 
         decoded_string = self.decompress(coded_array)
-        write_to_file(decoded_string, input_file, normal_dir)
+        fh.write_to_file(decoded_string, input_file, normal_dir)
 
         return decoded_string
 
-    def handle_comparison(self, input_file, normal_dir=NORMAL_DIR, packed_dir=PACKED_DIR):
+    def handle_comparison(self, input_file, normal_dir=fh.NORMAL_DIR, packed_dir=fh.PACKED_DIR):
         """Method which takes an input text file, compresses it
         and then compares the file size between the original with
         the compressed one.
@@ -78,9 +78,9 @@ class LZW:
         """
         if not self.handle_compression(input_file, normal_dir, packed_dir):
             return None
-        unpacked_size = get_size(input_file, False, normal_dir, packed_dir)
+        unpacked_size = fh.get_size(input_file, False, normal_dir, packed_dir)
         input_file = f"{input_file.split('.')[0]}.lzw"
-        packed_size = get_size(input_file, True, normal_dir, packed_dir)
+        packed_size = fh.get_size(input_file, True, normal_dir, packed_dir)
 
         return (unpacked_size, packed_size)
 
@@ -128,6 +128,7 @@ class LZW:
             output_string: decoded string
         """
         keys = {x: chr(x) for x in range(256)}
+        last_character = coded_array[0]
         output_string = ''
         nth_value = 256
 
@@ -140,9 +141,8 @@ class LZW:
                 substring = keys[character]
             output_string += substring
             last_character = substring[0]
-            keys[nth_value] = keys[old_value]+last_character
+            keys[nth_value] = keys[old_value] + last_character
             nth_value += 1
             old_value = character
 
-        print(f"decoded: {output_string}")
         return output_string

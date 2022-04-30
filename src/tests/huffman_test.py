@@ -22,10 +22,10 @@ class TestHuffman(unittest.TestCase):
         try:
             os.remove(os.path.join(PACKED_DIR, 'sample1.huf'))
             os.remove(os.path.join(PACKED_DIR, 'sample2.huf'))
-            os.remove(os.path.join(PACKED_DIR, 'sample1.json'))
-            os.remove(os.path.join(PACKED_DIR, 'sample2.json'))
+            os.remove(os.path.join(PACKED_DIR, 'sample3.huf'))
             os.remove(os.path.join(NORMAL_DIR, 'sample1_huf_decoded.txt'))
             os.remove(os.path.join(NORMAL_DIR, 'sample2_huf_decoded.txt'))
+            os.remove(os.path.join(NORMAL_DIR, 'sample3_huf_decoded.txt'))
         except Exception:
             pass
 
@@ -44,7 +44,13 @@ class TestHuffman(unittest.TestCase):
 
         self.assertLess(sizes[1], sizes[0])
 
-    """def test_3_sample1_decompression_and_input_file_content_equal(self):
+    def test_3_sample_3_packed_smaller_than_original(self):
+        sizes = self.huffman.handle_comparison(
+            'sample3.txt', NORMAL_DIR, PACKED_DIR)
+
+        self.assertLess(sizes[1], sizes[0])
+
+    def test_4_sample1_decompression_and_input_file_content_equal(self):
         decoded_string = self.huffman.handle_decompression(
             'sample1.huf', NORMAL_DIR, PACKED_DIR)
 
@@ -52,10 +58,19 @@ class TestHuffman(unittest.TestCase):
 
         self.assertEqual(decoded_string, content)
 
-    def test_4_sample2_decompression_and_input_file_content_equal(self):
+    def test_5_sample2_decompression_and_input_file_content_equal(self):
         decoded_string = self.huffman.handle_decompression(
             'sample2.huf', NORMAL_DIR, PACKED_DIR)
 
         content = read_from_input_file('sample2.txt', NORMAL_DIR)
 
-        self.assertEqual(decoded_string, content)"""
+        self.assertEqual(decoded_string, content)
+
+
+    def test_6_sample3_decompression_and_input_file_content_equal(self):
+        decoded_string = self.huffman.handle_decompression(
+            'sample3.huf', NORMAL_DIR, PACKED_DIR)
+
+        content = read_from_input_file('sample3.txt', NORMAL_DIR)
+
+        self.assertEqual(decoded_string, content)

@@ -1,7 +1,30 @@
+import argparse
 import sys
 import time
 from lzw import LZW
 from huffman import Huffman
+
+PARSER = argparse.ArgumentParser(prog='main.py',
+                                 description='Compression and decompression with LZW ' +
+                                 'and Huffman coding algorithms')
+
+PARSER.add_argument('Algorithm',
+                    metavar='algorithm',
+                    type=str,
+                    help='lzw, huffman or both')
+
+PARSER.add_argument('Operation',
+                    metavar='operation',
+                    type=str,
+                    help='compress, decompress or compare')
+
+PARSER.add_argument('Filename',
+                    metavar='filename',
+                    type=str,
+                    help='name of the file, if compression is executed pass a ' +
+                    'file from normal_files directory, ' +
+                    'for decompression packed_files and ' +
+                    'for comparison normal_files again.')
 
 
 def main():
@@ -9,70 +32,50 @@ def main():
     functions accordingly
 
     args:
-        python3 src/main.py [compression method] [command] [filename]
+        python3 src/main.py [compression algorithm] [command] [filename]
     """
-    if len(sys.argv) == 1:
-        print("Please specify a command. Use -h for instructions.")
-        return
-    if sys.argv[1] == "-h":
-        instructions()
-        return
-    if sys.argv[1] == "compare" and len(sys.argv) == 3:
-        compare_algorithms()
-        return
-    if len(sys.argv) < 4:
-        print("A file or compression method was not given. Use -h for instructions")
-        return
-    if sys.argv[2] == "compress":
-        if sys.argv[1] == 'lzw':
-            compress_lzw()
-        if sys.argv[1] == 'huffman':
-            compress_huffman()
-    if sys.argv[2] == "decompress":
-        if sys.argv[1] == 'lzw':
-            decompress_lzw()
-        if sys.argv[1] == 'huffman':
-            decompress_huffman()
-    if sys.argv[2] == "compare":
-        if sys.argv[1] == "lzw":
-            compare_lzw(sys.argv[3])
-        if sys.argv[1] == "huffman":
-            compare_huffman(sys.argv[3])
+    if ARGS.Algorithm not in ('lzw', 'huffman', 'both'):
+        print(f"{ARGS.Algorithm} is not a valid algorithm!")
+        sys.exit(1)
+    if ARGS.Operation not in ('compress', 'decompress', 'compare'):
+        print(f"{ARGS.Operation} is not a valid operation!")
+        sys.exit(1)
+
+    if ARGS.Algorithm == 'lzw':
+        if ARGS.Operation == 'compress':
+            compress_lzw(ARGS.Filename)
+        elif ARGS.Operation == 'decompress':
+            decompress_lzw(ARGS.Filename)
+        elif ARGS.Operation == 'compare':
+            compare_lzw(ARGS.Filename)
+
+    if ARGS.Algorithm == 'huffman':
+        if ARGS.Operation == 'compress':
+            compress_huffman(ARGS.Filename)
+        elif ARGS.Operation == 'decompress':
+            decompress_huffman(ARGS.Filename)
+        elif ARGS.Operation == 'compare':
+            compare_huffman(ARGS.Filename)
+
+    if ARGS.Algorithm == 'both':
+        if ARGS.Operation == 'compare':
+            compare_algorithms(ARGS.Filename)
+        elif ARGS.Operation == 'compress':
+            compress_both(ARGS.Filename)
+        elif ARGS.Operation == 'decompress':
+            decompress_both(ARGS.Filename)
 
 
-def instructions():
-    """Function which prints instructions on how to use this app.
-    """
-    print("Command usage:")
-    print("First argument presented must be the compression algorithm: either lzw or huffman.")
-    print("Second argument presented must be either compress, decompress or compare.")
-    print("Basic ascii characters are accepted. Present a file from normal_files directory.")
-    print("Third argument presented must be the filename which the operation will be applied to.")
-    print("Example: python3 main.py lzw compress test.txt\n")
-    print("For decompression, the same applies however you have to present a file " +
-          "from the packed_files directory.")
-    print("Example: python3 main.py lzw decompress test.lzw\n")
-    print("Comparison command compares the filesize between an " +
-          "unpacked and packed instance of data.")
-    print("Here again, second argument must be the algorithm desired and third the " +
-          "filename of an unpacked .txt file.")
-    print("Example: python3 main.py lzw compare test.txt\n")
-    print("If you want to compare between lzw and huffman, give compare as the first argument " +
-          "then an unpacked .txt file.")
-    print("Example: python3 main.py compare sample.txt")
-
-
-def compress_lzw():
+def compress_lzw(filename):
     """Function which calls the lzw compression of a file."""
-    compressed_string = lzw.handle_compression(sys.argv[3])
-    print(f"Compressed string: {compressed_string}")
+    if lzw.handle_compression(filename):
+        print("Done")
 
 
-def decompress_lzw():
+def decompress_lzw(filename):
     """Function which calls the lzw decompression of a compressed file"""
-    decompressed_string = lzw.handle_decompression(sys.argv[3])
-    print(f"Decompressed string: {decompressed_string}")
-    #print(f"Decompressed string: {lzw.decompress(sys.argv[2])}")
+    if lzw.handle_decompression(filename):
+        print("Done")
 
 
 def compare_lzw(filename):
@@ -87,20 +90,20 @@ def compare_lzw(filename):
             "LZW-algorithm achieved a total of " +
             f"{round((sizes[0]-sizes[1])/sizes[0], 3)*100}% decrease in file size."
         )
+        return sizes[1]
+    return None
 
-    return sizes[1]
 
-
-def compress_huffman():
+def compress_huffman(filename):
     """Function which calls the Huffman coding compression of a file"""
-    compressed_string = huff.handle_compression(sys.argv[3])
-    print(f"Compressed string: {compressed_string}")
+    if huff.handle_compression(filename):
+        print("Done")
 
 
-def decompress_huffman():
+def decompress_huffman(filename):
     """Function which calls the Huffman coding decompression of a file"""
-    decompressed_string = huff.handle_decompression(sys.argv[3])
-    print(f"Decompressed string: {decompressed_string}")
+    if huff.handle_decompression(filename):
+        print("Done")
 
 
 def compare_huffman(filename):
@@ -118,27 +121,45 @@ def compare_huffman(filename):
     return None
 
 
-def compare_algorithms():
+def compress_both(filename):
+    """Function which calls for the compression of both algorithms"""
+    if lzw.handle_compression(filename) and huff.handle_compression(filename):
+        print('Done')
+
+
+def decompress_both(filename):
+    """Function which calls for the decompression of both algorithms"""
+    filename = f"{filename.split('.')[0]}.lzw"
+    lzw_res = lzw.handle_decompression(filename)
+    filename = f"{filename.split('.')[0]}.huf"
+    huf_res = huff.handle_decompression(filename)
+    if lzw_res and huf_res:
+        print("Done")
+
+
+def compare_algorithms(filename):
     """Function which compares the compression efficiency between
     LZW and Huffman coding"""
-    lzw_size = compare_lzw(sys.argv[2])
-    print()
-    huff_size = compare_huffman(sys.argv[2])
-    print()
-
-    if not lzw_size or not huff_size:
+    lzw_size = compare_lzw(filename)
+    if not lzw_size:
         return
+    print()
+    huff_size = compare_huffman(filename)
+    if not huff_size:
+        return
+    print()
 
     if lzw_size < huff_size:
-        print(f"LZW-compressed file is {round((huff_size - lzw_size)*100/huff_size, 2)}% smaller than " +
-              "Huffman-compressed file.")
+        print(f"LZW-compressed file is {round((huff_size - lzw_size)*100/huff_size, 2)}% " +
+                "smaller than Huffman-compressed file.")
     else:
-        print(f"Huffman-compressed file is {round((lzw_size - huff_size)*100/lzw_size, 2)}% smaller than " +
-              "LZW-compressed file")
+        print(f"Huffman-compressed file is {round((lzw_size - huff_size)*100/lzw_size, 2)}% " +
+                "smaller than LZW-compressed file")
 
 
 if __name__ == '__main__':
     start_time = time.time()
+    ARGS = PARSER.parse_args()
     lzw = LZW()
     huff = Huffman()
     main()

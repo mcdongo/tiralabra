@@ -6,6 +6,7 @@ authors = ["Leevi Kokkinen <leevi.kokkinen@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
+argparse = "^1.4.0"
 
 [tool.poetry.dev-dependencies]
 pylint = "^2.13.0"

@@ -108,35 +108,6 @@ def get_size(filename, packed, normal_path=NORMAL_DIR, packed_path=PACKED_DIR):
         return "File not found"
 
 
-def read_json(filename, path=PACKED_DIR):
-    """Function which reads raw json data from a specified file,
-    converts it into a dict-object and returns it
-
-    args:
-        filename (str): The name of the file
-        path (str): Path of the wanted directory (by default /packed_files)
-    returns:
-        codes (dict): Dict containing all codes needed to have
-            this file decompressed
-    """
-    with open(os.path.join(path, f"{filename.split('.')[0]}.json"), 'r') as file:
-        codes = json.load(file)
-
-    return codes
-
-
-def write_json(filename, content, path=PACKED_DIR):
-    """Function which dumps json data into a file
-
-    args:
-        filename (str): Name of the file
-        content (dict): Codes for later decompression of wanted file
-        path (str): Path to the wanted directory (by default /packed_dir)
-    """
-    with open(os.path.join(path, f"{filename.split('.')[0]}.json"), 'w') as file:
-        json.dump(content, file)
-
-
 def read_from_huffman_file(filename, path=PACKED_DIR):
     """Function which reads raw binary data from a .huf file
 
@@ -144,20 +115,33 @@ def read_from_huffman_file(filename, path=PACKED_DIR):
         filename (str): Name of the file in question
         path (str): Path of the wanted directory (by default /packed_dir)
     """
+    huffman_tree = ""
     with open(os.path.join(path, filename), 'rb') as file:
+        while True:
+            byte = file.read(1).decode()
+            huffman_tree += byte
+            if byte == '}':
+                break
+
         data = file.read()
 
-    return data
+    return data, json.loads(huffman_tree)
 
 
-def write_huffman_file(output, filename, path=PACKED_DIR):
+def write_huffman_file(output, filename, huffman_tree, path=PACKED_DIR):
     """Function which writes Huffman-compressed binary data
     to a .huf file
 
     args:
         output (bytes): Raw binary data
+        huffman_tree (dict): Dict-object depicting a binary value for each
+            character appearing in the original string
         filename (str): Name of the file in question
         path (str): Path of the wanted directory (by default /packed_files)
     """
+    binary_huffman_tree = json.dumps(huffman_tree)
     with open(os.path.join(path, f"{filename.split('.')[0]}.huf"), 'wb') as file:
+        file.write(binary_huffman_tree.encode())
+
+    with open(os.path.join(path, f"{filename.split('.')[0]}.huf"), 'ab') as file:
         file.write(output)

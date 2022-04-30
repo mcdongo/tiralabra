@@ -1,5 +1,5 @@
 from heapq import heappop, heappush
-from filehandler import *
+import filehandler as fh
 
 
 class PriorityQueue:
@@ -99,15 +99,15 @@ class Huffman:
 
     def create_tree(self):
         """Method which creates a node for every unique character
-        in the original source string forming a linked list
+        in the original source string forming a tree structure
 
         returns:
             List: list of Node-objects
         """
         queue = PriorityQueue()
 
-        for x in self.freq:
-            queue.insert(self.freq[x], Node(self.freq[x], x))
+        for key, value in self.freq.items():
+            queue.insert(value, Node(value, key))
 
         while not queue.has_one_element():
             left = queue.get_next()
@@ -123,19 +123,14 @@ class Huffman:
 
         self.nodes = queue.get_nodes()
 
-    def merge_nodes(self, node, val=''):
-        """Method which recursively starts to merge
-        nodes into a tree structure
+    def form_codes(self, node, val=''):
 
-        args:
-            node (Node): 
-        """
         new_val = val + str(node.huff)
 
         if node.left:
-            self.merge_nodes(node.left, new_val)
+            self.form_codes(node.left, new_val)
         if node.right:
-            self.merge_nodes(node.right, new_val)
+            self.form_codes(node.right, new_val)
 
         if not node.left and not node.right:
             self.codes[node.symbol] = new_val
@@ -147,32 +142,40 @@ class Huffman:
 
         for character in input_string:
             output_string += str(self.codes[character])
-
         return output_string
 
-    def handle_compression(self, filename, normal_dir=NORMAL_DIR, packed_dir=PACKED_DIR):
+    def handle_compression(self, filename, normal_dir=fh.NORMAL_DIR, packed_dir=fh.PACKED_DIR):
         try:
-            text = read_from_input_file(filename, normal_dir)
+            text = fh.read_from_input_file(filename, normal_dir)
         except FileNotFoundError:
-            print("The specified file does ont exist.")
+            print("The specified file does not exist.")
             return None
 
         self.create_frequencies(text)
         self.create_tree()
         self.codes = {}
 
-        self.merge_nodes(self.nodes[0])
+        self.form_codes(self.nodes[0])
         compressed = self.compress(text)
-        write_huffman_file(self.to_bytes(compressed), filename, packed_dir)
-        write_json(filename, self.codes, packed_dir)
+        self.codes['length'] = len(compressed)
+        fh.write_huffman_file(self.to_bytes(compressed),
+                              filename, self.codes, packed_dir)
 
         return compressed
 
     def to_bytes(self, data):
-        b = bytearray()
+        binary_array = bytearray()
         for i in range(0, len(data), 8):
-            b.append(int(data[i:i+8], 2))
-        return bytes(b)
+            # if amount of bits is not divisible by 8, writes last byte "in reverse"
+            binary_array.append(int(data[i:i+8], 2))
+
+        coded_length = len(binary_array)*8
+        offset_value = coded_length - len(data)
+        if offset_value != 0:  # bitshift to correct the last byte
+            # 0b00000111 -> 0b11100000
+            binary_array[-1] = binary_array[-1] << offset_value
+
+        return bytes(binary_array)
 
     def decompress(self, coded_string, codes):
         codes_reversed = {codes[x]: x for x in codes}
@@ -187,10 +190,10 @@ class Huffman:
 
         return output_string
 
-    def handle_decompression(self, filename, normal_dir=NORMAL_DIR, packed_dir=PACKED_DIR):
+    def handle_decompression(self, filename, normal_dir=fh.NORMAL_DIR, packed_dir=fh.PACKED_DIR):
         try:
-            binary_string = read_from_huffman_file(filename, packed_dir)
-            codes = read_json(filename)
+            binary_string, codes = fh.read_from_huffman_file(
+                filename, packed_dir)
         except FileNotFoundError:
             print("The specified file does not exist.")
             return None
@@ -199,17 +202,20 @@ class Huffman:
         for part in binary_string:
             coded_string += f"{part:08b}"
 
+        length_diff = len(coded_string) - codes['length']
+        if length_diff != 0:
+            # OUTPUT SHOULD BE SAME AS ORIGINAL INPUT NOW
+            coded_string = coded_string[:-length_diff+1]
+
         decoded_text = self.decompress(coded_string, codes)
-        write_to_file(decoded_text, filename, normal_dir)
+        fh.write_to_file(decoded_text, filename, normal_dir)
         return decoded_text
 
-    def handle_comparison(self, filename, normal_dir=NORMAL_DIR, packed_dir=PACKED_DIR):
+    def handle_comparison(self, filename, normal_dir=fh.NORMAL_DIR, packed_dir=fh.PACKED_DIR):
         if not self.handle_compression(filename, normal_dir, packed_dir):
             return None
-        unpacked_size = get_size(filename, False, normal_dir, packed_dir)
+        unpacked_size = fh.get_size(filename, False, normal_dir, packed_dir)
         filename = f"{filename.split('.')[0]}.huf"
-        packed_size = get_size(filename, True, normal_dir, packed_dir)
-        filename = f"{filename.split('.')[0]}.json"
-        json_size = get_size(filename, True, normal_dir, packed_dir)
-        print(unpacked_size, packed_size)
-        return (unpacked_size, packed_size+json_size)
+        packed_size = fh.get_size(filename, True, normal_dir, packed_dir)
+
+        return (unpacked_size, packed_size)
