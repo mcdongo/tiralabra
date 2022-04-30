@@ -31,6 +31,7 @@ Pylint code analysis can be run from the root directory with:
 To get the coverage report, please run these following commands from the root directory:
 
 > poetry run invoke coverage
+
 > poetry run coverage html
 
 This will create a htmlcov directory in the root directory, which contains index.html. You can see the coverage report if you open this file in a browser.
