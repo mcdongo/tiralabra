@@ -65,7 +65,7 @@ class TestLZW(unittest.TestCase):
         content = read_from_input_file('sample2.txt', NORMAL_DIR)
 
         self.assertEqual(decoded_string, content)
-    
+
     def test_6_sample_3_decompression_and_input_file_content_equal(self):
         decoded_string = self.lzw.handle_decompression(
             'sample3.lzw', NORMAL_DIR, PACKED_DIR)
@@ -73,4 +73,3 @@ class TestLZW(unittest.TestCase):
         content = read_from_input_file('sample3.txt', NORMAL_DIR)
 
         self.assertEqual(decoded_string, content)
-        

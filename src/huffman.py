@@ -13,18 +13,11 @@ class PriorityQueue:
         self._priorities = {}
 
     def has_one_element(self):
-        """Method which returns true if
-        there is only one element in the _elements heap
-
-        returns:
-            boolean: True if only one element in heap
-                False otherwise
-        """
+        """Returns true if the heap only has one element"""
         return len(self._elements) == 1
 
     def insert(self, priority, info):
-        """Method which inserts a tuple into
-        the heap
+        """Inserts a tuple into the heap
 
         args:
             priority (int): The value which is used
@@ -79,9 +72,8 @@ class Huffman:
         self.nodes = []
 
     def create_frequencies(self, text):
-        """A method which goes through every single character
-        in the source string and keeps track on how many times
-        an individual character has been seen
+        """Creates a dict which keeps track how many times
+        an unique symbol has appeared in the source text
 
         args:
             text (str): The source string
@@ -98,12 +90,7 @@ class Huffman:
         return self.freq
 
     def create_tree(self):
-        """Method which creates a node for every unique character
-        in the original source string forming a tree structure
-
-        returns:
-            List: list of Node-objects
-        """
+        """Creates the Huffman tree data structure"""
         queue = PriorityQueue()
 
         for key, value in self.freq.items():
@@ -124,6 +111,15 @@ class Huffman:
         self.nodes = queue.get_nodes()
 
     def form_codes(self, node, val=''):
+        """Goes through the Huffman tree recursively and saves
+        the binary reprsentation for each symbol into a dict
+
+        Args:
+            node (Node): current Node in question
+            val (str): The binary reprsentation of a node in the Huffman tree
+        Returns:
+            self.codes (dict): Huffman tree keys and values
+        """
 
         new_val = val + str(node.huff)
 
@@ -138,6 +134,14 @@ class Huffman:
         return self.codes
 
     def compress(self, input_string):
+        """Compresses a given string with
+        the codes from the Huffman tree
+
+        Args:
+            input_string (str): Text to be compressed
+        Returns:
+            output_string (str): String converted to Huffman tree values
+        """
         output_string = ""
 
         for character in input_string:
@@ -145,6 +149,15 @@ class Huffman:
         return output_string
 
     def handle_compression(self, filename, normal_dir=fh.NORMAL_DIR, packed_dir=fh.PACKED_DIR):
+        """Handles everything related to compressing a file
+
+        Args:
+            filename (str): Name of the source file
+            normal_dir (str): Directory in which the source file is located
+            packed_dir (str): Directory where compressed files are saved
+        Returns:
+            compressed (str): Text converted to Huffman tree values
+        """
         try:
             text = fh.read_from_input_file(filename, normal_dir)
         except FileNotFoundError:
@@ -164,6 +177,14 @@ class Huffman:
         return compressed
 
     def to_bytes(self, data):
+        """Takes a converted string and converts it further
+        to bytes.
+
+        Args:
+            data (str): converted text
+        Returns:
+            binary_array (Bytes): converted data to be written
+        """
         binary_array = bytearray()
         for i in range(0, len(data), 8):
             # if amount of bits is not divisible by 8, writes last byte "in reverse"
@@ -178,6 +199,14 @@ class Huffman:
         return bytes(binary_array)
 
     def decompress(self, coded_string, codes):
+        """Decompresses data with Huffman tree values
+
+        Args:
+            coded_string (str): binary written continuously
+            codes (dict): Huffman tree keys and values
+        Returns:
+            output_string (str): Decompressed string
+        """
         codes_reversed = {codes[x]: x for x in codes}
         substring = ''
         output_string = ''
@@ -191,6 +220,15 @@ class Huffman:
         return output_string
 
     def handle_decompression(self, filename, normal_dir=fh.NORMAL_DIR, packed_dir=fh.PACKED_DIR):
+        """Handles everything related to decompressing a file
+
+        Args:
+            filename (str): Name of the source file
+            normal_dir (str): Directory in which the source file is located
+            packed_dir (str): Directory where compressed files are saved
+        Returns:
+            decoded_text (str): Decompressed text
+        """
         try:
             binary_string, codes = fh.read_from_huffman_file(
                 filename, packed_dir)
@@ -212,6 +250,16 @@ class Huffman:
         return decoded_text
 
     def handle_comparison(self, filename, normal_dir=fh.NORMAL_DIR, packed_dir=fh.PACKED_DIR):
+        """Compares the file size between a compressed instace of data with
+        the source file
+
+        Args:
+            filename (str): Name of the source file
+            normal_dir (str): Directory in which the source file is located
+            packed_dir (str): Directory where compressed files are saved
+        Returns:
+            (unpacked_size (int), packed_size(int)): file sizes in bytes
+        """
         if not self.handle_compression(filename, normal_dir, packed_dir):
             return None
         unpacked_size = fh.get_size(filename, False, normal_dir, packed_dir)

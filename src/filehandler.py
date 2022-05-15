@@ -1,3 +1,5 @@
+"""Module used to read and write files"""
+
 import os
 import json
 from struct import pack, unpack
@@ -11,7 +13,7 @@ if not os.path.isdir(PACKED_DIR):
 
 
 def write_to_file(output, filename, path=NORMAL_DIR):
-    """Function which writes a plain string into a file
+    """Write plain text to a file
 
     args:
         output: (str) String to be written
@@ -27,16 +29,12 @@ def write_to_file(output, filename, path=NORMAL_DIR):
 
 
 def write_to_coded_file(output, filename, path=PACKED_DIR):
-    """Function which writes compressed binary data into a file
+    """Write LZW-compressed data to a file
 
     args:
-        output: (List) List of bytes-like objects packed with
-            the struct-library
-        filename: (str) The name of the file which the operation
-            will be applied to (file format will be discarded
-            and changed to .lzw)
-        path: (str) Path to the directory in which the
-            writing will take place (by default /packed_files)
+        output: (List) List of bytes-like objects
+        filename: (str) The name of the packed file
+        path: (str) Path to the packed directory
     """
     filename = filename.split('.')[0]
     with open(os.path.join(path, f"{filename}.lzw"), 'wb') as file:
@@ -45,13 +43,11 @@ def write_to_coded_file(output, filename, path=PACKED_DIR):
 
 
 def read_from_input_file(input_file, path=NORMAL_DIR):
-    """Function which reads the contents of a given plain
-        text file
+    """Reads plain text from a .txt file
 
     args:
         input_file: (str) The name of the file in question
-        path: (str) Path to the directory in which the
-            reading will take place (by default /normal_files)
+        path: (str) Path to the wanted directory
     returns:
         input_string: (str) The contents of given file
     """
@@ -62,16 +58,13 @@ def read_from_input_file(input_file, path=NORMAL_DIR):
 
 
 def read_from_coded_file(filename, path=PACKED_DIR):
-    """Function which reads the contents of a compressed binary
-        file and unpacks it with the struct-library
+    """Reads raw binary data compressed with lzw and unpacks it
 
     args:
         filename: (str) The name of the file in question
-        path: (str) Path to the directory in which the
-            reading will take place (by default /packed_files)
+        path: (str) Path to the wanted directory
     returns:
-        coded_array: (List) A list of integers which all depict
-            a character or a substring
+        coded_array: (List) A list of integers
     """
     coded_array = []
     with open(os.path.join(path, filename), 'rb') as file:
@@ -86,16 +79,13 @@ def read_from_coded_file(filename, path=PACKED_DIR):
 
 
 def get_size(filename, packed, normal_path=NORMAL_DIR, packed_path=PACKED_DIR):
-    """Function which returns the size of a given file in bytes
+    """Gets a size of a file in bytes
 
     args:
         filename: (str) The name of the file in question
-        packed: (boolean) depicts whether or not to use
-            normal files or packed files
-        normal_path: (str) The path to the directory containing
-            normal text files (by default /normal_files)
-        packed_path: (str) The path to the directory containing
-            compressed binary files (by default packed_files)
+        packed: (boolean) If true, packed_files directory, normal_files otherwise
+        normal_path: (str) The path to the normal_files directory
+        packed_path: (str) The path to the packed_files directory
     returns:
         size: (int) The size of a given file in bytes
         string: If the given file does not exist
@@ -109,11 +99,14 @@ def get_size(filename, packed, normal_path=NORMAL_DIR, packed_path=PACKED_DIR):
 
 
 def read_from_huffman_file(filename, path=PACKED_DIR):
-    """Function which reads raw binary data from a .huf file
+    """Reads raw binary data from a .huf file
 
     args:
         filename (str): Name of the file in question
-        path (str): Path of the wanted directory (by default /packed_dir)
+        path (str): Path of the wanted directory
+    returns:
+        data (str): A string consisting of integers
+        dict: Contains huffman tree values
     """
     huffman_tree = ""
     with open(os.path.join(path, filename), 'rb') as file:
@@ -129,15 +122,13 @@ def read_from_huffman_file(filename, path=PACKED_DIR):
 
 
 def write_huffman_file(output, filename, huffman_tree, path=PACKED_DIR):
-    """Function which writes Huffman-compressed binary data
-    to a .huf file
+    """Writes data compressed with Huffman
 
     args:
         output (bytes): Raw binary data
-        huffman_tree (dict): Dict-object depicting a binary value for each
-            character appearing in the original string
+        huffman_tree (dict): Huffman tree keys and values
         filename (str): Name of the file in question
-        path (str): Path of the wanted directory (by default /packed_files)
+        path (str): Path of the wanted directory
     """
     binary_huffman_tree = json.dumps(huffman_tree)
     with open(os.path.join(path, f"{filename.split('.')[0]}.huf"), 'wb') as file:

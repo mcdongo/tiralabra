@@ -5,3 +5,4 @@ htmlcov/
 
 src/normal_files/*
 !src/normal_files/sample.txt
+src/packed_files/*

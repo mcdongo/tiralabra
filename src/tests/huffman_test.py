@@ -66,7 +66,6 @@ class TestHuffman(unittest.TestCase):
 
         self.assertEqual(decoded_string, content)
 
-
     def test_6_sample3_decompression_and_input_file_content_equal(self):
         decoded_string = self.huffman.handle_decompression(
             'sample3.huf', NORMAL_DIR, PACKED_DIR)

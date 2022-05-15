@@ -151,10 +151,10 @@ def compare_algorithms(filename):
 
     if lzw_size < huff_size:
         print(f"LZW-compressed file is {round((huff_size - lzw_size)*100/huff_size, 2)}% " +
-                "smaller than Huffman-compressed file.")
+              "smaller than Huffman-compressed file.")
     else:
         print(f"Huffman-compressed file is {round((lzw_size - huff_size)*100/lzw_size, 2)}% " +
-                "smaller than LZW-compressed file")
+              "smaller than LZW-compressed file")
 
 
 if __name__ == '__main__':

@@ -7,20 +7,14 @@ class LZW:
     """
 
     def handle_compression(self, input_file, normal_dir=fh.NORMAL_DIR, packed_dir=fh.PACKED_DIR):
-        """Method which reads the input string from a file
-        and compresses it.
-        Stores it into a desired file in packed_files folder.
+        """Handles everything necessary to compress a file
 
         args:
-            input_string (str): The filename the desired
-                file
-            normal_dir (str): The directory where unpacked
-                files are located (by default /normal_files)
-            packed_dir (str): The directory where packed
-                files are located (by default /packed_files)
+            input_file (str): Desired source file
+            normal_dir (str): Directory of the source file
+            packed_dir (str): Desired export directory
         returns:
-            output_string (str): compressed version of the contents
-                of input_string
+            output_string (str): compressed version of the source file
             None if the input file specified does not exist
         """
         try:
@@ -33,20 +27,15 @@ class LZW:
         return output_string
 
     def handle_decompression(self, input_file, normal_dir=fh.NORMAL_DIR, packed_dir=fh.PACKED_DIR):
-        """Method which reads compressed binary data from a specified
-        file, runs it through the decompression algorithm and writes
-        it into a normal text file.
+        """Handles everything necessary to decompress a file
 
         args:
-            input_file (str): The filename in question
-            normal_dir (str): The directory where normal
-                files are located (by default /normal_files)
-            packed_dir (str): The directory where compressed
-                files are located (by default /packed files)
+            input_file (str): Desired source file
+            normal_dir (str): Directory of the source file
+            packed_dir (str): Desired export directory
         returns:
-            decoded_string (str): The contents of a compressed
-                binary file converted into text
-            None if the file specified can't be found
+            decoded_string (str): decompressed version of the source file
+            None if the input file specified does not exist
         """
         try:
 
@@ -61,20 +50,15 @@ class LZW:
         return decoded_string
 
     def handle_comparison(self, input_file, normal_dir=fh.NORMAL_DIR, packed_dir=fh.PACKED_DIR):
-        """Method which takes an input text file, compresses it
-        and then compares the file size between the original with
-        the compressed one.
+        """Compares the file size between a compressed instace of data with
+        the source file
 
-        args:
-            input_file (str): Name of the file in question
-            normal_dir (str): The directory where normal
-                files are located (by default /normal_files)
-            packed_dir (str): The directory where compressed
-                files are located (by default /packed_files)
-        returns:
-            unpacked_size (int), packed_size (int) (tuple):
-                The sizes of said files
-            None if the input file can't be found
+        Args:
+            input_file (str): Name of the source file
+            normal_dir (str): Directory in which the source file is located
+            packed_dir (str): Directory where compressed files are saved
+        Returns:
+            (unpacked_size (int), packed_size(int)): file sizes in bytes
         """
         if not self.handle_compression(input_file, normal_dir, packed_dir):
             return None
@@ -85,15 +69,14 @@ class LZW:
         return (unpacked_size, packed_size)
 
     def compress(self, input_string):
-        """Method which applies the LZW-algorithm onto
-        a string and returns a compressed version of it
+        """Compresses a string with the LZW algorithm
 
         Args:
             input_string (str): string to be compressed
         Returns:
             output_string (str): compressed string
-            output_array (list): a list containing all set integer
-                values for certain strings and substrings
+            output_array (list): every element in list is a single character
+                coded with lzw
         """
         keys = {chr(x): x for x in range(256)}
         nth_value = 256
@@ -117,15 +100,15 @@ class LZW:
         return output_string, output_array
 
     def decompress(self, coded_array):
-        """Method which decompresses a string which
-        has been compressed with the LZW-algorithm.
+        """Decompresses a string with LZW decompression
+        algorithm
 
         args:
             coded_array (list): a list containing
                 integers which represent a character
                 or a substring
         returns:
-            output_string: decoded string
+            output_string (str): decoded string
         """
         keys = {x: chr(x) for x in range(256)}
         last_character = coded_array[0]

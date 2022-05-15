@@ -21,6 +21,9 @@ Tests can be run from the root directory with the command:
 ![coverage](/documentation/coverage.png)
 
 ## Wikipedia articles used
+
 [Alan Turing](https://en.wikipedia.org/wiki/Alan_Turing)
+
 [Lempel-Ziv-Welch](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Welch)
+
 [Response to the COVID-19 pandemic in April 2020](https://en.wikipedia.org/wiki/Responses_to_the_COVID-19_pandemic_in_April_2020)
